@@ -1,0 +1,3122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>羽毛球巅峰对决</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; overflow: hidden; background: #000; }
+
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .page.active {
+            opacity: 1;
+            transform: translateY(0);
+            z-index: 1;
+            pointer-events: auto;
+        }
+
+        .intro-page {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #0a0a0a 100%);
+        }
+
+        .intro-content { text-align: center; padding: 20px; }
+        .intro-title { font-size: clamp(2.5rem, 8vw, 5rem); font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(231,76,60,0.5); margin-bottom: 30px; letter-spacing: 4px; }
+        .intro-subtitle { font-size: clamp(1rem, 3vw, 1.5rem); color: #e74c3c; font-weight: 600; letter-spacing: 8px; }
+        .intro-hint { font-size: clamp(0.8rem, 2vw, 1rem); color: rgba(255,255,255,0.6); margin-top: 60px; }
+
+        .race-page {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .race-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.6) 30%, rgba(0,0,0,0.65) 70%, rgba(0,0,0,0.85) 100%);
+            z-index: 1;
+        }
+
+        .race-content {
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* 2022年印尼羽毛球公开赛 - 第5页 */
+        .indonesia-page {
+            background-color: #0a0a0a;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .indonesia-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race4(1).jpeg') 30% center/cover no-repeat;
+            filter: blur(2px) saturate(0.8);
+            z-index: 0;
+        }
+
+        .indonesia-page::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/lee.jpg') center/cover no-repeat;
+            filter: blur(2px) saturate(0.8);
+            z-index: 0;
+        }
+
+        .indonesia-blend-overlay {
+            position: absolute;
+            top: 0;
+            left: calc(50% - 120px);
+            width: 240px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(10,10,10,0.7) 0%, transparent 50%, rgba(10,10,10,0.7) 100%);
+            z-index: 1;
+        }
+
+        .indonesia-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10,10,10,0.65);
+            z-index: 2;
+        }
+
+        .indonesia-content {
+            position: relative;
+            z-index: 10;
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            max-height: calc(100% - 120px);
+            overflow-y: auto;
+        }
+
+        .indonesia-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .indonesia-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .indonesia-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #55efc4, #00b894);
+            border-radius: 3px;
+        }
+
+        .indonesia-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #66ffd4, #11c9a4);
+        }
+
+        .indonesia-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .indonesia-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(85,239,196,0.4);
+            overflow: hidden;
+        }
+
+        .indonesia-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .indonesia-title {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 900;
+            color: #fff;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .indonesia-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #f1c40f, transparent);
+        }
+
+        .indonesia-event-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .indonesia-event-info span {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+
+        .indonesia-event-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .indonesia-event-round {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+
+        .indonesia-event-date {
+            font-size: 13px;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .indonesia-match-section {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 50px;
+        }
+
+        .indonesia-players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .indonesia-player {
+            text-align: center;
+        }
+
+        .indonesia-player-name {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .indonesia-player-name.winner {
+            color: #55efc4;
+            text-shadow: 0 0 20px rgba(85,239,196,0.5);
+        }
+
+        .indonesia-player-name.loser {
+            color: #fff;
+        }
+
+        .indonesia-player-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .indonesia-player-badge {
+            display: inline-block;
+            font-size: 10px;
+            color: #000;
+            background: #55efc4;
+            padding: 3px 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .indonesia-vs {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            background: #e74c3c;
+            padding: 12px 28px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .indonesia-scoreboard {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .indonesia-score-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+        }
+
+        .indonesia-scores {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .indonesia-score-item {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 900;
+        }
+
+        .indonesia-score-item.normal {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .indonesia-score-item.highlight {
+            color: #55efc4;
+            text-shadow: 0 0 20px rgba(85,239,196,0.5);
+        }
+
+        .indonesia-score-divider {
+            color: rgba(255,255,255,0.3);
+            font-size: 1.5rem;
+        }
+
+        .indonesia-winner-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .indonesia-winner-badge {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            background: linear-gradient(135deg, #55efc4, #00b894);
+            padding: 12px 40px;
+            border-radius: 30px;
+            letter-spacing: 3px;
+            box-shadow: 0 8px 30px rgba(85,239,196,0.4);
+        }
+
+        .indonesia-detail-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .indonesia-detail-card {
+            background: rgba(0,0,0,0.6);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indonesia-detail-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(85,239,196,0.3);
+        }
+
+        .indonesia-detail-card.active {
+            border-color: rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.6);
+        }
+
+        .indonesia-detail-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(85,239,196,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .indonesia-detail-card.active .indonesia-detail-icon {
+            background: rgba(85,239,196,0.1);
+        }
+
+        .indonesia-detail-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #55efc4;
+        }
+
+        .indonesia-detail-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .indonesia-detail-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .indonesia-detail-cards {
+                grid-template-columns: 1fr;
+            }
+            .indonesia-players {
+                gap: 20px;
+            }
+            .indonesia-vs {
+                font-size: 1rem;
+                padding: 8px 20px;
+            }
+        }
+
+        /* 2022年丹麦羽毛球公开赛 - 第6页 */
+        .denmark-page {
+            background-color: #0a0a0a;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .denmark-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race5(1).jpg') center/cover no-repeat;
+            filter: blur(2px) saturate(0.8);
+            z-index: 0;
+        }
+
+        .denmark-page::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race5(2).jpeg') center/cover no-repeat;
+            filter: blur(2px) saturate(0.8);
+            z-index: 0;
+        }
+
+        .denmark-blend-overlay {
+            position: absolute;
+            top: 0;
+            left: calc(50% - 120px);
+            width: 240px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(10,10,10,0.7) 0%, transparent 50%, rgba(10,10,10,0.7) 100%);
+            z-index: 1;
+        }
+
+        .denmark-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10,10,10,0.65);
+            z-index: 2;
+        }
+
+        .denmark-content {
+            position: relative;
+            z-index: 10;
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            max-height: calc(100% - 120px);
+            overflow-y: auto;
+        }
+
+        .denmark-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .denmark-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .denmark-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
+            border-radius: 3px;
+        }
+
+        .denmark-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #44a8eb, #3990c9);
+        }
+
+        .denmark-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .denmark-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(52,152,219,0.4);
+            overflow: hidden;
+        }
+
+        .denmark-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .denmark-title {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 900;
+            color: #fff;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .denmark-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #3498db, transparent);
+        }
+
+        .denmark-event-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .denmark-event-info span {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+
+        .denmark-event-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .denmark-event-round {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+
+        .denmark-event-date {
+            font-size: 13px;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .denmark-match-section {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 50px;
+        }
+
+        .denmark-players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .denmark-player {
+            text-align: center;
+        }
+
+        .denmark-player-name {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .denmark-player-name.winner {
+            color: #3498db;
+            text-shadow: 0 0 20px rgba(52,152,219,0.5);
+        }
+
+        .denmark-player-name.loser {
+            color: #fff;
+        }
+
+        .denmark-player-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .denmark-player-badge {
+            display: inline-block;
+            font-size: 10px;
+            color: #fff;
+            background: #3498db;
+            padding: 3px 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .denmark-vs {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            background: #e74c3c;
+            padding: 12px 28px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .denmark-scoreboard {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .denmark-score-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+        }
+
+        .denmark-scores {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .denmark-score-item {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 900;
+        }
+
+        .denmark-score-item.normal {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .denmark-score-item.highlight {
+            color: #3498db;
+            text-shadow: 0 0 20px rgba(52,152,219,0.5);
+        }
+
+        .denmark-score-divider {
+            color: rgba(255,255,255,0.3);
+            font-size: 1.5rem;
+        }
+
+        .denmark-winner-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .denmark-winner-badge {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            padding: 12px 40px;
+            border-radius: 30px;
+            letter-spacing: 3px;
+            box-shadow: 0 8px 30px rgba(52,152,219,0.4);
+        }
+
+        .denmark-detail-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .denmark-detail-card {
+            background: rgba(0,0,0,0.6);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .denmark-detail-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(52,152,219,0.3);
+        }
+
+        .denmark-detail-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(52,152,219,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .denmark-detail-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #3498db;
+        }
+
+        .denmark-detail-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .denmark-detail-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .denmark-detail-cards {
+                grid-template-columns: 1fr;
+            }
+            .denmark-players {
+                gap: 20px;
+            }
+            .denmark-vs {
+                font-size: 1rem;
+                padding: 8px 20px;
+            }
+        }
+
+        /* 2025年日本羽毛球公开赛 - 第7页 */
+        .japan-page {
+            background-color: #0a0a0a;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .japan-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race6(1).jpg') center/cover no-repeat;
+            filter: blur(2px) saturate(0.8);
+            z-index: 0;
+        }
+
+        .japan-page::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race6(2).webp') center/cover no-repeat;
+            filter: blur(2px) saturate(0.8);
+            z-index: 0;
+        }
+
+        .japan-blend-overlay {
+            position: absolute;
+            top: 0;
+            left: calc(50% - 120px);
+            width: 240px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(10,10,10,0.7) 0%, transparent 50%, rgba(10,10,10,0.7) 100%);
+            z-index: 1;
+        }
+
+        .japan-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10,10,10,0.65);
+            z-index: 2;
+        }
+
+        .japan-content {
+            position: relative;
+            z-index: 10;
+            width: 95%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            max-height: calc(100% - 120px);
+            overflow-y: auto;
+        }
+
+        .japan-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .japan-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .japan-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #e74c3c, #c0392b);
+            border-radius: 3px;
+        }
+
+        .japan-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #f75c4c, #d0493b);
+        }
+
+        .japan-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .japan-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 25px rgba(231,76,60,0.4);
+            overflow: hidden;
+        }
+
+        .japan-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .japan-title {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 900;
+            color: #fff;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .japan-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #e74c3c, transparent);
+        }
+
+        .japan-event-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .japan-event-info span {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+
+        .japan-event-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .japan-event-round {
+            font-size: 12px;
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 2px;
+        }
+
+        .japan-event-date {
+            font-size: 13px;
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .japan-match-section {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 40px 30px;
+            margin-bottom: 50px;
+        }
+
+        .japan-players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .japan-player {
+            text-align: center;
+        }
+
+        .japan-player-name {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .japan-player-name.winner {
+            color: #e74c3c;
+            text-shadow: 0 0 20px rgba(231,76,60,0.5);
+        }
+
+        .japan-player-name.loser {
+            color: #fff;
+        }
+
+        .japan-player-title {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .japan-player-badge {
+            display: inline-block;
+            font-size: 10px;
+            color: #fff;
+            background: #e74c3c;
+            padding: 3px 12px;
+            border-radius: 10px;
+            margin-top: 8px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .japan-vs {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fff;
+            background: #e74c3c;
+            padding: 12px 28px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        .japan-scoreboard {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .japan-score-label {
+            font-size: 11px;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 15px;
+        }
+
+        .japan-scores {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .japan-score-item {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            font-weight: 900;
+        }
+
+        .japan-score-item.normal {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .japan-score-item.highlight {
+            color: #e74c3c;
+            text-shadow: 0 0 20px rgba(231,76,60,0.5);
+        }
+
+        .japan-score-divider {
+            color: rgba(255,255,255,0.3);
+            font-size: 1.5rem;
+        }
+
+        .japan-winner-section {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .japan-winner-badge {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            padding: 12px 40px;
+            border-radius: 30px;
+            letter-spacing: 3px;
+            box-shadow: 0 8px 30px rgba(231,76,60,0.4);
+        }
+
+        .japan-detail-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 50px;
+        }
+
+        .japan-detail-card {
+            background: rgba(0,0,0,0.6);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .japan-detail-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(231,76,60,0.3);
+        }
+
+        .japan-detail-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(231,76,60,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .japan-detail-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #e74c3c;
+        }
+
+        .japan-detail-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .japan-detail-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .japan-detail-cards {
+                grid-template-columns: 1fr;
+            }
+            .japan-players {
+                gap: 20px;
+            }
+            .japan-vs {
+                font-size: 1rem;
+                padding: 8px 20px;
+            }
+        }
+
+        .race-header { position: absolute; top: 30px; left: 30px; text-align: left; }
+        .race-round { font-size: clamp(0.7rem, 2vw, 0.9rem); color: rgba(255,255,255,0.7); letter-spacing: 2px; margin-bottom: 5px; }
+        .race-date { font-size: clamp(0.8rem, 2vw, 1rem); color: rgba(231,76,60,0.8); font-weight: 600; }
+
+        .race-title { font-size: clamp(1.5rem, 5vw, 3rem); font-weight: 900; color: #fff; text-shadow: 0 0 20px rgba(255,255,255,0.3); margin-bottom: 30px; letter-spacing: 2px; }
+
+        .players-container { display: flex; justify-content: center; align-items: center; gap: clamp(20px, 5vw, 50px); margin-bottom: 30px; flex-wrap: wrap; }
+        .player { font-size: clamp(1.5rem, 6vw, 3rem); font-weight: 800; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .player.winner { color: #3498db; text-shadow: 0 0 20px rgba(52,152,219,0.5); }
+        .vs { font-size: clamp(1rem, 4vw, 2rem); font-weight: 900; color: #e74c3c; }
+
+        .score-container {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(231,76,60,0.3);
+            border-radius: 10px;
+            padding: clamp(15px, 4vw, 25px) clamp(30px, 8vw, 50px);
+            display: inline-block;
+        }
+        .score-label { font-size: clamp(0.8rem, 2vw, 1rem); color: rgba(255,255,255,0.6); margin-bottom: 10px; letter-spacing: 3px; }
+        .score-value { font-size: clamp(1.5rem, 5vw, 2.5rem); font-weight: 900; color: #fff; letter-spacing: 2px; }
+        .set-score:not(:last-child)::after { content: ','; margin: 0 10px; color: rgba(255,255,255,0.5); }
+
+        .winner-badge { margin-top: 30px; }
+        .winner-badge span {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            color: #3498db;
+            font-weight: 700;
+            background: rgba(52,152,219,0.1);
+            border: 1px solid rgba(52,152,219,0.3);
+            border-radius: 25px;
+            padding: 10px 30px;
+            letter-spacing: 4px;
+        }
+
+        .pagination {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+        }
+        .pagination-dots { display: flex; gap: 10px; }
+        .pagination-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .pagination-dot.active {
+            width: 30px;
+            border-radius: 6px;
+            background: #e74c3c;
+            box-shadow: 0 0 15px rgba(231,76,60,0.5);
+        }
+        .pagination-info { font-size: 12px; color: rgba(255,255,255,0.6); letter-spacing: 2px; }
+
+        .images-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .image-frame {
+            width: calc(50% - 10px);
+            max-width: 400px;
+            aspect-ratio: 16/10;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid rgba(231,76,60,0.3);
+            position: relative;
+        }
+
+        .image-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-frame::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+        }
+
+        /* 全英公开赛详情页特殊样式 */
+        .allengland-page {
+            background-size: cover;
+            background-position: center 10%;
+        }
+
+        .allengland-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.65) 20%, rgba(0,0,0,0.6) 50%, rgba(0,0,0,0.7) 80%, rgba(0,0,0,0.9) 100%);
+            z-index: 1;
+        }
+
+        .allengland-content {
+            position: relative;
+            z-index: 2;
+            width: 95%;
+            max-width: 1400px;
+            height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .allengland-content::-webkit-scrollbar { width: 6px; }
+        .allengland-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .allengland-content::-webkit-scrollbar-thumb { background: rgba(231,76,60,0.5); border-radius: 3px; }
+
+        .allengland-header {
+            text-align: center;
+            padding: 20px 0 40px;
+            border-bottom: 1px solid rgba(231,76,60,0.2);
+            margin-bottom: 40px;
+        }
+
+        .allengland-logo {
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .allengland-tournament {
+            font-size: clamp(1.8rem, 6vw, 3rem);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .allengland-tournament a,
+        .olympic-tournament a,
+        .worldchamp-title a,
+        .indonesia-title a,
+        .denmark-title a,
+        .japan-title a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .allengland-tournament a:hover {
+            border-bottom-color: #e74c3c;
+            text-shadow: 0 0 20px rgba(231,76,60,0.5);
+        }
+
+        .olympic-tournament a:hover {
+            border-bottom-color: #f1c40f;
+            text-shadow: 0 0 20px rgba(241,196,15,0.5);
+        }
+
+        .worldchamp-title a:hover {
+            border-bottom-color: #3498db;
+            text-shadow: 0 0 20px rgba(52,152,219,0.5);
+        }
+
+        .indonesia-title a:hover {
+            border-bottom-color: #55efc4;
+            text-shadow: 0 0 20px rgba(85,239,196,0.5);
+        }
+
+        .denmark-title a:hover {
+            border-bottom-color: #3498db;
+            text-shadow: 0 0 20px rgba(52,152,219,0.5);
+        }
+
+        .japan-title a:hover {
+            border-bottom-color: #e74c3c;
+            text-shadow: 0 0 20px rgba(231,76,60,0.5);
+        }
+
+        .allengland-subtitle {
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        .allengland-event-info {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            color: rgba(255,255,255,0.65);
+        }
+
+        .allengland-match-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 35px;
+            background: rgba(0,0,0,0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(231,76,60,0.15);
+            margin-bottom: 40px;
+        }
+
+        .allengland-players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(20px, 8vw, 50px);
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+
+        .allengland-player {
+            text-align: center;
+        }
+
+        .allengland-player-name {
+            font-size: clamp(1.8rem, 7vw, 3rem);
+            font-weight: 800;
+            color: #fff;
+            position: relative;
+        }
+
+        .allengland-player.winner .allengland-player-name {
+            color: #e74c3c;
+            text-shadow: 0 0 25px rgba(231,76,60,0.5);
+        }
+
+        .allengland-player.winner .allengland-player-name::after {
+            content: ' WINNER';
+            font-size: 0.35em;
+            font-weight: 600;
+            color: #e74c3c;
+            background: rgba(231,76,60,0.15);
+            padding: 3px 10px;
+            border-radius: 10px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .allengland-player-english {
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 5px;
+        }
+
+        .allengland-vs {
+            font-size: clamp(1.2rem, 5vw, 2.2rem);
+            font-weight: 900;
+            color: #e74c3c;
+            padding: 12px 25px;
+            background: rgba(231,76,60,0.1);
+            border-radius: 12px;
+            border: 2px solid rgba(231,76,60,0.3);
+        }
+
+        .allengland-score-section {
+            text-align: center;
+        }
+
+        .allengland-score-label {
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .allengland-score-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(12px, 4vw, 25px);
+            flex-wrap: wrap;
+        }
+
+        .allengland-set-score {
+            font-size: clamp(2rem, 8vw, 3.2rem);
+            font-weight: 900;
+            color: #fff;
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .allengland-set-score:hover {
+            background: rgba(231,76,60,0.15);
+            border-color: rgba(231,76,60,0.4);
+            transform: scale(1.03);
+        }
+
+        .allengland-set-score.highlight {
+            background: rgba(231,76,60,0.18);
+            border-color: #e74c3c;
+            color: #e74c3c;
+            box-shadow: 0 0 35px rgba(231,76,60,0.35);
+            font-size: clamp(2.5rem, 10vw, 4rem);
+        }
+
+        .allengland-set-score.highlight:hover {
+            background: rgba(231,76,60,0.25);
+            box-shadow: 0 0 50px rgba(231,76,60,0.5);
+        }
+
+        .allengland-set-divider {
+            color: rgba(255,255,255,0.3);
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+        }
+
+        .allengland-detail-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .allengland-detail-card {
+            background: rgba(0,0,0,0.4);
+            border-radius: 14px;
+            padding: 28px;
+            border: 1px solid rgba(231,76,60,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .allengland-detail-card:hover {
+            border-color: rgba(231,76,60,0.25);
+        }
+
+        .allengland-detail-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(231,76,60,0.1);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .allengland-detail-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #e74c3c;
+        }
+
+        .allengland-detail-title {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .allengland-detail-text {
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        .allengland-detail-text strong {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        /* 东京奥运会详情页特殊样式 */
+        .olympic-page {
+            background-size: cover;
+            background-position: center 15%;
+        }
+
+        .olympic-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.65) 50%, rgba(0,0,0,0.75) 80%, rgba(0,0,0,0.9) 100%);
+            z-index: 1;
+        }
+
+        .olympic-content {
+            position: relative;
+            z-index: 2;
+            width: 95%;
+            max-width: 1400px;
+            height: 90vh;
+            overflow-y: auto;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .olympic-content::-webkit-scrollbar { width: 6px; }
+        .olympic-content::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        .olympic-content::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.5); border-radius: 3px; }
+
+        .olympic-header {
+            text-align: center;
+            padding: 40px 0 50px;
+            border-bottom: 1px solid rgba(255,215,0,0.2);
+            margin-bottom: 50px;
+        }
+
+        .olympic-logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+        }
+
+        .olympic-tournament {
+            font-size: clamp(1.8rem, 7vw, 3.5rem);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(255,215,0,0.3);
+        }
+
+        .olympic-subtitle {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: rgba(255,255,255,0.6);
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+        }
+
+        .olympic-event-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .olympic-match-section {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 1px solid rgba(255,215,0,0.15);
+            margin-bottom: 50px;
+        }
+
+        .olympic-players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(25px, 10vw, 60px);
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .olympic-player {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .olympic-player:hover {
+            transform: scale(1.03);
+        }
+
+        .olympic-player-name {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 800;
+            color: #fff;
+            position: relative;
+        }
+
+        .olympic-player.winner .olympic-player-name {
+            color: #ffd700;
+            text-shadow: 0 0 30px rgba(255,215,0,0.5);
+        }
+
+        .olympic-player-tag {
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            font-weight: 600;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .olympic-player-tag.reigning {
+            background: rgba(255,255,255,0.1);
+            color: #4fc3f7;
+            border: 1px solid rgba(79,195,247,0.3);
+        }
+
+        .olympic-player-tag.champion {
+            background: rgba(255,215,0,0.15);
+            color: #ffd700;
+            border: 1px solid rgba(255,215,0,0.4);
+        }
+
+        .olympic-player-english {
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 8px;
+        }
+
+        .olympic-vs {
+            font-size: clamp(1.3rem, 5vw, 2.5rem);
+            font-weight: 900;
+            color: #e74c3c;
+            padding: 15px 30px;
+            background: rgba(231,76,60,0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(231,76,60,0.3);
+        }
+
+        .olympic-score-section {
+            text-align: center;
+        }
+
+        .olympic-score-label {
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 25px;
+        }
+
+        .olympic-score-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(15px, 5vw, 30px);
+            flex-wrap: wrap;
+        }
+
+        .olympic-set-score {
+            font-size: clamp(2.2rem, 9vw, 3.8rem);
+            font-weight: 900;
+            color: #fff;
+            padding: 20px 40px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .olympic-set-score:hover {
+            background: rgba(255,215,0,0.15);
+            border-color: rgba(255,215,0,0.4);
+            transform: scale(1.05);
+        }
+
+        .olympic-set-divider {
+            color: rgba(255,255,255,0.3);
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
+        }
+
+        .olympic-winner-badge {
+            margin-top: 30px;
+        }
+
+        .olympic-winner-badge span {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #ffd700;
+            font-weight: 700;
+            background: rgba(255,215,0,0.12);
+            border: 1px solid rgba(255,215,0,0.35);
+            border-radius: 30px;
+            padding: 12px 40px;
+            letter-spacing: 5px;
+        }
+
+        .olympic-detail-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 28px;
+        }
+
+        .olympic-detail-card {
+            background: rgba(0,0,0,0.5);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid rgba(255,215,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .olympic-detail-card:hover {
+            border-color: rgba(255,215,0,0.25);
+        }
+
+        .olympic-detail-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(255,215,0,0.1);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .olympic-detail-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #ffd700;
+        }
+
+        .olympic-detail-title {
+            font-size: clamp(1.1rem, 3vw, 1.3rem);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .olympic-detail-text {
+            font-size: clamp(0.85rem, 2.5vw, 1rem);
+            color: rgba(255,255,255,0.75);
+            line-height: 1.9;
+        }
+
+        .olympic-detail-text strong {
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .olympic-detail-text .highlight-china {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .olympic-detail-text .highlight-denmark {
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        /* 2021年世界羽毛球锦标赛详情页样式 */
+        .worldchamp-page {
+            background-color: #0a0a0a;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .worldchamp-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race3(1).jpg') center/cover no-repeat;
+            z-index: 0;
+        }
+
+        .worldchamp-page::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50%;
+            height: 100%;
+            background: url('images/race3(2).webp') center/cover no-repeat;
+            z-index: 0;
+        }
+
+        .worldchamp-blend-overlay {
+            position: absolute;
+            top: 0;
+            left: calc(50% - 80px);
+            width: 160px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(10,10,10,0.6) 0%, transparent 50%, rgba(10,10,10,0.6) 100%);
+            z-index: 1;
+        }
+
+        .worldchamp-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10,10,10,0.7);
+            z-index: 2;
+        }
+
+        .worldchamp-content {
+            position: relative;
+            z-index: 2;
+            width: 95%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            height: 92vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .worldchamp-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .worldchamp-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .worldchamp-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00a8ff, #0066cc);
+            border-radius: 3px;
+        }
+
+        .worldchamp-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #00b8ff, #0077dd);
+        }
+
+        .worldchamp-content::-moz-scrollbar {
+            width: 6px;
+        }
+
+        .worldchamp-content::-moz-scrollbar-track {
+            background: transparent;
+        }
+
+        .worldchamp-content::-moz-scrollbar-thumb {
+            background: linear-gradient(to bottom, #00a8ff, #0066cc);
+            border-radius: 3px;
+        }
+
+        .worldchamp-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .worldchamp-logo {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #d92027 0%, #0066cc 100%);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(217,32,39,0.3);
+        }
+
+        .worldchamp-logo svg {
+            width: 40px;
+            height: 40px;
+            fill: #fff;
+        }
+
+        .worldchamp-title {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 3px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .worldchamp-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #d92027, transparent);
+        }
+
+        .worldchamp-event-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            color: rgba(255,255,255,0.7);
+        }
+
+        .worldchamp-match-section {
+            background: rgba(0,0,0,0.5);
+            border-radius: 20px;
+            padding: 40px 30px;
+            border: 1px solid rgba(217,32,39,0.15);
+            margin-bottom: 50px;
+            width: 100%;
+        }
+
+        .worldchamp-players {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(25px, 10vw, 60px);
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .worldchamp-player {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .worldchamp-player:hover {
+            transform: scale(1.03);
+        }
+
+        .worldchamp-player-name {
+            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-weight: 800;
+            color: #fff;
+            position: relative;
+        }
+
+        .worldchamp-player.winner .worldchamp-player-name {
+            color: #3498db;
+            text-shadow: 0 0 30px rgba(52,152,219,0.5);
+        }
+
+        .worldchamp-player-tag {
+            font-size: clamp(0.7rem, 2vw, 0.85rem);
+            font-weight: 600;
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .worldchamp-player.winner .worldchamp-player-tag {
+            background: rgba(52,152,219,0.15);
+            color: #3498db;
+            border: 1px solid rgba(52,152,219,0.3);
+        }
+
+        .worldchamp-player.loser .worldchamp-player-tag {
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .worldchamp-player-english {
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 8px;
+        }
+
+        .worldchamp-vs {
+            font-size: clamp(1.2rem, 5vw, 2.2rem);
+            font-weight: 900;
+            color: #d92027;
+            padding: 12px 25px;
+            background: rgba(217,32,39,0.1);
+            border-radius: 12px;
+            border: 2px solid rgba(217,32,39,0.3);
+        }
+
+        .worldchamp-score-section {
+            text-align: center;
+        }
+
+        .worldchamp-score-label {
+            font-size: clamp(0.75rem, 2vw, 0.9rem);
+            color: rgba(255,255,255,0.5);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 20px;
+        }
+
+        .worldchamp-score-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .worldchamp-set-score {
+            font-size: clamp(1.5rem, 6vw, 2.5rem);
+            font-weight: 800;
+            color: #fff;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .worldchamp-set-score:hover {
+            transform: scale(1.05);
+        }
+
+        .worldchamp-set-score.highlight {
+            color: #0066cc;
+            background: rgba(0,102,204,0.15);
+            box-shadow: 0 0 20px rgba(0,102,204,0.3);
+        }
+
+        .worldchamp-set-divider {
+            color: rgba(255,255,255,0.3);
+            font-size: clamp(1.2rem, 4vw, 1.6rem);
+        }
+
+        .worldchamp-detail-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            width: 100%;
+        }
+
+        .worldchamp-detail-card {
+            background: rgba(0,0,0,0.4);
+            border-radius: 14px;
+            padding: 28px;
+            border: 1px solid rgba(217,32,39,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .worldchamp-detail-card:hover {
+            border-color: rgba(217,32,39,0.25);
+        }
+
+        .worldchamp-detail-icon {
+            width: 45px;
+            height: 45px;
+            background: rgba(217,32,39,0.1);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .worldchamp-detail-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: #d92027;
+        }
+
+        .worldchamp-detail-title {
+            font-size: clamp(1rem, 3vw, 1.2rem);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .worldchamp-detail-text {
+            font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+            color: rgba(255,255,255,0.7);
+            line-height: 1.8;
+        }
+
+        .worldchamp-detail-text strong {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .image-frame { width: 100%; max-width: 350px; }
+            .allengland-content { padding: 20px 15px; height: 92vh; }
+            .allengland-header { padding: 15px 0 25px; margin-bottom: 25px; }
+            .allengland-logo { height: 60px; }
+            .allengland-match-section { padding: 20px 15px; margin-bottom: 25px; }
+            .allengland-players { gap: 15px; margin-bottom: 25px; }
+            .allengland-detail-section { gap: 18px; }
+            .allengland-detail-card { padding: 20px; }
+            .allengland-event-info { gap: 15px; }
+            .olympic-content { padding: 25px 15px; height: 92vh; }
+            .olympic-header { padding: 25px 0 35px; margin-bottom: 35px; }
+            .olympic-logo { width: 80px; height: 80px; }
+            .olympic-match-section { padding: 25px 20px; margin-bottom: 35px; }
+            .olympic-players { gap: 15px; margin-bottom: 25px; }
+            .olympic-detail-section { gap: 20px; }
+            .olympic-detail-card { padding: 22px; }
+            .olympic-event-info { gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="pages-container" id="pagesContainer">
+        <div class="page intro-page active" id="page0">
+            <div class="intro-content">
+                <h1 class="intro-title">羽球巅峰</h1>
+                <p class="intro-subtitle">近六年最精彩的六场羽毛球男单对决</p>
+                <p class="intro-hint">滚动鼠标浏览</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination">
+        <div class="pagination-dots" id="paginationDots"></div>
+        <div class="pagination-info" id="paginationInfo">01 / 07</div>
+    </div>
+
+    <script>
+        const imageMap = {
+            0: ['images/race1.png'],
+            1: ['images/race2.png'],
+            2: ['images/race3(1).jpg', 'images/race3(2).webp'],
+            3: ['images/race4(1).jpeg', 'images/lee.jpg'],
+            4: ['images/race5(1).jpg', 'images/race5(2).jpeg'],
+            5: ['images/race6(1).jpg', 'images/race6(2).webp']
+        };
+
+        let currentPage = 0;
+        let totalPages = 7;
+        let isAnimating = false;
+
+        function goToPage(pageIndex) {
+            if (isAnimating || pageIndex === currentPage || pageIndex < 0 || pageIndex >= totalPages) return;
+            isAnimating = true;
+
+            document.querySelectorAll('.page').forEach(function(p) {
+                p.classList.remove('active');
+            });
+            document.getElementById('page' + pageIndex).classList.add('active');
+
+            updatePagination(pageIndex);
+            currentPage = pageIndex;
+
+            setTimeout(function() { isAnimating = false; }, 800);
+        }
+
+        function updatePagination(pageIndex) {
+            document.querySelectorAll('.pagination-dot').forEach(function(dot, i) {
+                if (i === pageIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+            document.getElementById('paginationInfo').textContent =
+                String(pageIndex + 1).padStart(2, '0') + ' / ' + String(totalPages).padStart(2, '0');
+        }
+
+        function createAllEnglandPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page allengland-page';
+            page.id = 'page1';
+            page.style.backgroundImage = 'url(images/race1.png)';
+
+            page.innerHTML = `
+                <div class="allengland-content">
+                    <div class="allengland-header">
+                        <svg class="allengland-logo" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="20" y="10" width="160" height="60" rx="8" fill="#000" stroke="#e74c3c" stroke-width="2"/>
+                            <text x="100" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#e74c3c">YONEX</text>
+                            <text x="100" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#fff">ALL ENGLAND OPEN</text>
+                            <text x="100" y="70" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#999">BADMINTON CHAMPIONSHIPS</text>
+                        </svg>
+                        <h1 class="allengland-tournament"><a href="https://www.bilibili.com/video/BV1To4y1z7yF/?spm_id_from=333.337.search-card.all.click&vd_source=a59a5e65f4b46e2b9f9f88587d3ea1ee" target="_blank" rel="noopener noreferrer">2021年全英羽毛球公开赛</a></h1>
+                        <p class="allengland-subtitle">YONEX ALL ENGLAND OPEN</p>
+                        <div class="allengland-event-info">
+                            <span>2021年3月21日</span>
+                            <span>Arena Birmingham, 英国伯明翰</span>
+                            <span>男单决赛</span>
+                        </div>
+                    </div>
+
+                    <div class="allengland-match-section">
+                        <div class="allengland-players">
+                            <div class="allengland-player winner">
+                                <div class="allengland-player-name">李梓嘉</div>
+                                <div class="allengland-player-english">Lee Zii Jia</div>
+                            </div>
+                            <div class="allengland-vs">VS</div>
+                            <div class="allengland-player">
+                                <div class="allengland-player-name">安赛龙</div>
+                                <div class="allengland-player-english">Viktor Axelsen</div>
+                            </div>
+                        </div>
+                        <div class="allengland-score-section">
+                            <div class="allengland-score-label">MATCH POINT</div>
+                            <div class="allengland-score-display">
+                                <div class="allengland-set-score highlight">30-29</div>
+                                <span class="allengland-set-divider">,</span>
+                                <div class="allengland-set-score">20-22</div>
+                                <span class="allengland-set-divider">,</span>
+                                <div class="allengland-set-score">21-9</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="allengland-detail-section">
+                        <div class="allengland-detail-card">
+                            <div class="allengland-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <h3 class="allengland-detail-title">赛事背景</h3>
+                            <p class="allengland-detail-text">
+                                全英羽毛球公开赛被誉为「羽毛球小世锦赛」，是羽坛历史最悠久、含金量最高的赛事之一。2021年赛事中，<strong>安赛龙</strong>作为世界排名第一的夺冠热门，携年度最佳状态强势来袭，志在卫冕冠军。
+                            </p>
+                        </div>
+                        <div class="allengland-detail-card">
+                            <div class="allengland-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                                    <line x1="12" y1="22" x2="12" y2="15.5"/>
+                                </svg>
+                            </div>
+                            <h3 class="allengland-detail-title">高光时刻</h3>
+                            <p class="allengland-detail-text">
+                                首局比赛堪称经典！双方鏖战至<strong>30-29</strong>，李梓嘉在关键时刻展现惊人心理素质，以一记斜线杀球拿下制胜分。这位马来西亚新星以黑马姿态，用凌厉的进攻彻底打乱安赛龙的节奏。
+                            </p>
+                        </div>
+                        <div class="allengland-detail-card">
+                            <div class="allengland-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <h3 class="allengland-detail-title">赛事意义</h3>
+                            <p class="allengland-detail-text">
+                                这场胜利标志着<strong>马来西亚时隔多年再度登顶全英男单冠军</strong>，李梓嘉成为继李宗伟之后又一位闪耀羽坛的大马名将。他的胜利不仅打破了安赛龙的夺冠预期，更为羽坛注入了新活力。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            pagesContainer.appendChild(page);
+        }
+
+        function createOlympicPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page olympic-page';
+            page.id = 'page2';
+            page.style.backgroundImage = 'url(images/race2.png)';
+
+            page.innerHTML = `
+                <div class="olympic-content">
+                    <div class="olympic-header">
+                        <svg class="olympic-logo" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="50" cy="50" r="45" fill="#1a1a1a" stroke="#ffd700" stroke-width="3"/>
+                            <circle cx="50" cy="50" r="38" fill="none" stroke="#ffd700" stroke-width="2"/>
+                            <path d="M50 25 L50 75 M25 50 L75 50" stroke="#ffd700" stroke-width="2"/>
+                            <circle cx="50" cy="50" r="12" fill="#ffd700"/>
+                            <text x="50" y="55" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="#000">TOKYO</text>
+                        </svg>
+                        <h1 class="olympic-tournament"><a href="https://www.bilibili.com/video/BV1SjwXefED1/?spm_id_from=333.337.search-card.all.click&vd_source=a59a5e65f4b46e2b9f9f88587d3ea1ee" target="_blank" rel="noopener noreferrer">2020东京奥运会羽毛球男单决赛</a></h1>
+                        <p class="olympic-subtitle">OLYMPIC GAMES TOKYO 2020</p>
+                        <div class="olympic-event-info">
+                            <span>2021年8月2日</span>
+                            <span>东京奥运会</span>
+                            <span>男单决赛</span>
+                        </div>
+                    </div>
+
+                    <div class="olympic-match-section">
+                        <div class="olympic-players">
+                            <div class="olympic-player">
+                                <div class="olympic-player-name">谌龙</div>
+                                <div class="olympic-player-tag reigning">卫冕冠军</div>
+                                <div class="olympic-player-english">Chen Long</div>
+                            </div>
+                            <div class="olympic-vs">VS</div>
+                            <div class="olympic-player winner">
+                                <div class="olympic-player-name">安赛龙</div>
+                                <div class="olympic-player-tag champion">奥运冠军</div>
+                                <div class="olympic-player-english">Viktor Axelsen</div>
+                            </div>
+                        </div>
+                        <div class="olympic-score-section">
+                            <div class="olympic-score-label">MATCH POINT</div>
+                            <div class="olympic-score-display">
+                                <div class="olympic-set-score">15-21</div>
+                                <span class="olympic-set-divider">,</span>
+                                <div class="olympic-set-score">12-21</div>
+                            </div>
+                            <div class="olympic-winner-badge"><span>WINNER: 安赛龙</span></div>
+                        </div>
+                    </div>
+
+                    <div class="olympic-detail-section">
+                        <div class="olympic-detail-card">
+                            <div class="olympic-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <h3 class="olympic-detail-title">赛事背景</h3>
+                            <p class="olympic-detail-text">
+                                <span class="highlight-china">谌龙</span>作为中国羽毛球队领军人物、<strong>里约奥运会卫冕冠军</strong>，肩负着捍卫国羽荣誉的重任。而<span class="highlight-denmark">安赛龙</span>作为世界顶尖选手，状态正盛，志在冲击个人首枚奥运金牌。这场决赛汇聚了羽坛最强力量，备受全球瞩目。
+                            </p>
+                        </div>
+                        <div class="olympic-detail-card">
+                            <div class="olympic-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/><line x1="12" y1="22" x2="12" y2="15.5"/>
+                                </svg>
+                            </div>
+                            <h3 class="olympic-detail-title">比赛高光</h3>
+                            <p class="olympic-detail-text">
+                                决赛中双方展现出极高的竞技水准。<span class="highlight-china">谌龙</span>凭借丰富的大赛经验顽强拼搏，而<span class="highlight-denmark">安赛龙</span>则以强势进攻掌控节奏。这场对决打破了谌龙此前对安赛龙的交手优势，安赛龙以绝对实力赢得比赛，展现了新一代羽球王者的风采。
+                            </p>
+                        </div>
+                        <div class="olympic-detail-card">
+                            <div class="olympic-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <h3 class="olympic-detail-title">赛事意义</h3>
+                            <p class="olympic-detail-text">
+                                <span class="highlight-denmark">安赛龙</span>成为<strong>丹麦首位羽毛球男单奥运冠军</strong>，创造历史。<span class="highlight-china">谌龙</span>则实现了<strong>奥运男单三连牌</strong>的壮举（伦敦铜牌、里约金牌、东京银牌）。这场比赛标志着羽坛新老交替的完成，是羽球史上的标志性对决。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            pagesContainer.appendChild(page);
+        }
+
+        function createWorldChampPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page worldchamp-page';
+            page.id = 'page3';
+
+            page.innerHTML = `
+                <div class="worldchamp-blend-overlay"></div>
+                <div class="worldchamp-overlay"></div>
+                <div class="worldchamp-content">
+                    <div class="worldchamp-header">
+                        <div class="worldchamp-logo">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <ellipse cx="12" cy="12" rx="10" ry="8"/>
+                                <path d="M12 6 L12 18 M8 12 L16 12"/>
+                            </svg>
+                        </div>
+                        <h1 class="worldchamp-title"><a href="https://v.youku.com/v_show/id_XNTgyNzExNDYwMA==.html?spm=a2hkm.8166622.PhoneSokuUgc_5.dscreenshot&playMode=pugv&frommaciku=1" target="_blank" rel="noopener noreferrer">2021年世界羽毛球锦标赛</a></h1>
+                        <div class="worldchamp-event-info">
+                            <span>男单首轮</span>
+                            <span>2021-12-13</span>
+                        </div>
+                    </div>
+
+                    <div class="worldchamp-match-section">
+                        <div class="worldchamp-players">
+                            <div class="worldchamp-player winner">
+                                <div class="worldchamp-player-name">骆建佑</div>
+                                <div class="worldchamp-player-tag">世界冠军</div>
+                                <div class="worldchamp-player-english">Loh Kean Yew</div>
+                            </div>
+                            <div class="worldchamp-vs">VS</div>
+                            <div class="worldchamp-player loser">
+                                <div class="worldchamp-player-name">安赛龙</div>
+                                <div class="worldchamp-player-tag">世界第一</div>
+                                <div class="worldchamp-player-english">Viktor Axelsen</div>
+                            </div>
+                        </div>
+                        <div class="worldchamp-score-section">
+                            <div class="worldchamp-score-label">MATCH POINT</div>
+                            <div class="worldchamp-score-display">
+                                <div class="worldchamp-set-score">14-21</div>
+                                <span class="worldchamp-set-divider">,</span>
+                                <div class="worldchamp-set-score highlight">21-9</div>
+                                <span class="worldchamp-set-divider">,</span>
+                                <div class="worldchamp-set-score highlight">21-6</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="worldchamp-detail-section">
+                        <div class="worldchamp-detail-card">
+                            <div class="worldchamp-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <h3 class="worldchamp-detail-title">赛事背景</h3>
+                            <p class="worldchamp-detail-text">
+                                2021年世锦赛是疫情后首次举办的羽毛球顶级赛事，<strong>安赛龙</strong>作为世界排名第一的选手，被视为夺冠最大热门。而<strong>骆建佑</strong>当时排名仅第39位，赛前并不被看好。
+                            </p>
+                        </div>
+                        <div class="worldchamp-detail-card">
+                            <div class="worldchamp-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                                    <line x1="12" y1="22" x2="12" y2="15.5"/>
+                                </svg>
+                            </div>
+                            <h3 class="worldchamp-detail-title">高光时刻</h3>
+                            <p class="worldchamp-detail-text">
+                                骆建佑展现了惊人的速度和进攻火力，第二局以<strong>21-9</strong>悬殊比分横扫，第三局更是打出<strong>21-6</strong>的统治级表现，全场比赛仅耗时38分钟。
+                            </p>
+                        </div>
+                        <div class="worldchamp-detail-card">
+                            <div class="worldchamp-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <h3 class="worldchamp-detail-title">赛事意义</h3>
+                            <p class="worldchamp-detail-text">
+                                这场胜利开启了骆建佑的传奇之路，他一路过关斩将最终<strong>夺得世锦赛冠军</strong>，成为新加坡历史上首位羽毛球世界冠军，创造了羽坛最大黑马奇迹。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            pagesContainer.appendChild(page);
+        }
+
+        function createIndonesiaPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page indonesia-page';
+            page.id = 'page4';
+
+            page.innerHTML = `
+                <div class="indonesia-blend-overlay"></div>
+                <div class="indonesia-overlay"></div>
+
+                <div class="indonesia-content">
+                    <div class="indonesia-header">
+                        <div class="indonesia-logo">
+                            <img src="images/yinni.webp" alt="Indonesia Open" />
+                        </div>
+                        <h1 class="indonesia-title"><a href="https://v.qq.com/x/page/t3343f7a986.html" target="_blank" rel="noopener noreferrer">2022年印尼羽毛球公开赛</a></h1>
+                        <div class="indonesia-event-info">
+                            <span>INDONESIA OPEN</span>
+                        </div>
+                        <div class="indonesia-event-meta">
+                            <span class="indonesia-event-round">男单半决赛</span>
+                            <span class="indonesia-event-date">2022-06-18</span>
+                        </div>
+                    </div>
+
+                    <div class="indonesia-match-section">
+                        <div class="indonesia-players">
+                            <div class="indonesia-player">
+                                <div class="indonesia-player-name winner">安赛龙</div>
+                                <div class="indonesia-player-title">VIKTOR AXELSEN</div>
+                                <div class="indonesia-player-badge">世界第一</div>
+                            </div>
+                            <div class="indonesia-vs">VS</div>
+                            <div class="indonesia-player">
+                                <div class="indonesia-player-name loser">李梓嘉</div>
+                                <div class="indonesia-player-title">LEE ZII JIA</div>
+                                <div class="indonesia-player-badge">大马名将</div>
+                            </div>
+                        </div>
+
+                        <div class="indonesia-scoreboard">
+                            <div class="indonesia-score-label">MATCH POINT</div>
+                            <div class="indonesia-scores">
+                                <div class="indonesia-score-item normal">19-21</div>
+                                <div class="indonesia-score-divider">,</div>
+                                <div class="indonesia-score-item highlight">21-11</div>
+                                <div class="indonesia-score-divider">,</div>
+                                <div class="indonesia-score-item highlight">23-21</div>
+                            </div>
+                        </div>
+
+                        <div class="indonesia-winner-section">
+                            <div class="indonesia-winner-badge">WINNER: 安赛龙</div>
+                        </div>
+                    </div>
+
+                    <div class="indonesia-detail-cards">
+                        <div class="indonesia-detail-card active">
+                            <div class="indonesia-detail-icon">
+                                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                            </div>
+                            <div class="indonesia-detail-title">赛事背景</div>
+                            <div class="indonesia-detail-text">2022年印尼公开赛是超级1000级别赛事，安赛龙作为世界第一参赛，李梓嘉则是大马头号选手，两人此前多次交手，竞争激烈。</div>
+                        </div>
+                        <div class="indonesia-detail-card">
+                            <div class="indonesia-detail-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/></svg>
+                            </div>
+                            <div class="indonesia-detail-title">高光时刻</div>
+                            <div class="indonesia-detail-text">决胜局双方战至21平，安赛龙凭借关键网前小球和强势扣杀连得2分，以23-21惊险获胜，展现超强心理素质。</div>
+                        </div>
+                        <div class="indonesia-detail-card">
+                            <div class="indonesia-detail-icon">
+                                <svg viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+                            </div>
+                            <div class="indonesia-detail-title">赛事意义</div>
+                            <div class="indonesia-detail-text">这场胜利巩固了安赛龙的世界第一地位，也延续了他对李梓嘉的交手优势，成为他2022年统治赛季的重要一环。</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            pagesContainer.appendChild(page);
+        }
+
+        function createRacePage(race, pageIndex) {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page race-page';
+            page.id = 'page' + pageIndex;
+
+            if (pageIndex >= 4 && pageIndex <= 6) {
+                page.style.backgroundImage = 'none';
+                const bgImg = imageMap[pageIndex - 1][0];
+                page.style.setProperty('--bg-image', 'url(' + bgImg + ')');
+            } else {
+                const imagePath = imageMap[pageIndex - 1][0];
+                page.style.backgroundImage = 'url(' + imagePath + ')';
+            }
+
+            const eventName = race['赛事名称'] || '未知赛事';
+            const round = race['类型/轮次'] || '未知轮次';
+            const date = race['日期'] || '未知日期';
+            const players = race['参赛运动员'] || '未知选手';
+            const winner = race['胜者'] || '未知胜者';
+            const score = race['小局比分'] || '未知比分';
+
+            const playerArray = players.split(' vs ');
+            const player1 = playerArray[0] || '选手1';
+            const player2 = playerArray[1] || '选手2';
+
+            let scoreHtml = '';
+            score.split(',').forEach(function(set) {
+                scoreHtml += '<span class="set-score">' + set.trim() + '</span>';
+            });
+
+            let imagesHtml = '';
+            if (pageIndex >= 4 && pageIndex <= 6) {
+                const images = imageMap[pageIndex - 1];
+                imagesHtml = '<div class="images-container">';
+                images.forEach(function(img) {
+                    imagesHtml += '<div class="image-frame"><img src="' + img + '" alt="比赛照片"></div>';
+                });
+                imagesHtml += '</div>';
+            }
+
+            page.innerHTML = '<div class="race-content">' +
+                '<div class="race-header"><div class="race-round">' + round + '</div><div class="race-date">' + date + '</div></div>' +
+                '<h2 class="race-title">' + eventName + '</h2>' +
+                imagesHtml +
+                '<div class="players-container">' +
+                    '<div class="player ' + (player1 === winner ? 'winner' : '') + '">' + player1 + '</div>' +
+                    '<div class="vs">VS</div>' +
+                    '<div class="player ' + (player2 === winner ? 'winner' : '') + '">' + player2 + '</div>' +
+                '</div>' +
+                '<div class="score-container">' +
+                    '<div class="score-label">MATCH POINT</div>' +
+                    '<div class="score-value">' + scoreHtml + '</div>' +
+                '</div>' +
+                '<div class="winner-badge"><span>WINNER: ' + winner + '</span></div>' +
+            '</div>';
+
+            pagesContainer.appendChild(page);
+        }
+
+        function createPagination() {
+            const paginationDots = document.getElementById('paginationDots');
+            for (let i = 0; i < totalPages; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'pagination-dot' + (i === 0 ? ' active' : '');
+                dot.onclick = function() { goToPage(i); };
+                paginationDots.appendChild(dot);
+            }
+        }
+
+        function addEventListeners() {
+            let lastWheel = 0;
+            window.addEventListener('wheel', function(e) {
+                const now = Date.now();
+                if (now - lastWheel < 500) return;
+                lastWheel = now;
+
+                if (currentPage === 1) {
+                    const content = document.querySelector('.allengland-content');
+                    if (content) {
+                        const canScrollDown = content.scrollTop < content.scrollHeight - content.clientHeight;
+                        const canScrollUp = content.scrollTop > 0;
+
+                        if (e.deltaY > 0) {
+                            if (canScrollDown) {
+                                content.scrollTop += 100;
+                            } else {
+                                goToPage(currentPage + 1);
+                            }
+                        } else {
+                            if (canScrollUp) {
+                                content.scrollTop -= 100;
+                            } else {
+                                goToPage(currentPage - 1);
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if (currentPage === 2) {
+                    const content = document.querySelector('.olympic-content');
+                    if (content) {
+                        const canScrollDown = content.scrollTop < content.scrollHeight - content.clientHeight;
+                        const canScrollUp = content.scrollTop > 0;
+
+                        if (e.deltaY > 0) {
+                            if (canScrollDown) {
+                                content.scrollTop += 100;
+                            } else {
+                                goToPage(currentPage + 1);
+                            }
+                        } else {
+                            if (canScrollUp) {
+                                content.scrollTop -= 100;
+                            } else {
+                                goToPage(currentPage - 1);
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if (currentPage === 3) {
+                    const content = document.querySelector('.worldchamp-content');
+                    if (content) {
+                        const canScrollDown = content.scrollTop < content.scrollHeight - content.clientHeight;
+                        const canScrollUp = content.scrollTop > 0;
+
+                        if (e.deltaY > 0) {
+                            if (canScrollDown) {
+                                content.scrollTop += 100;
+                            } else {
+                                goToPage(currentPage + 1);
+                            }
+                        } else {
+                            if (canScrollUp) {
+                                content.scrollTop -= 100;
+                            } else {
+                                goToPage(currentPage - 1);
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if (currentPage === 4) {
+                    const content = document.querySelector('.indonesia-content');
+                    if (content) {
+                        const scrollDiff = content.scrollHeight - content.clientHeight - content.scrollTop;
+                        const canScrollDown = scrollDiff > 20;
+                        const canScrollUp = content.scrollTop > 20;
+
+                        if (e.deltaY > 0) {
+                            if (canScrollDown) {
+                                content.scrollTop += 100;
+                            } else {
+                                goToPage(currentPage + 1);
+                            }
+                        } else {
+                            if (canScrollUp) {
+                                content.scrollTop -= 100;
+                            } else {
+                                goToPage(currentPage - 1);
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if (currentPage === 5) {
+                    const content = document.querySelector('.denmark-content');
+                    if (content) {
+                        const scrollDiff = content.scrollHeight - content.clientHeight - content.scrollTop;
+                        const canScrollDown = scrollDiff > 20;
+                        const canScrollUp = content.scrollTop > 20;
+
+                        if (e.deltaY > 0) {
+                            if (canScrollDown) {
+                                content.scrollTop += 100;
+                            } else {
+                                goToPage(currentPage + 1);
+                            }
+                        } else {
+                            if (canScrollUp) {
+                                content.scrollTop -= 100;
+                            } else {
+                                goToPage(currentPage - 1);
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if (currentPage === 6) {
+                    const content = document.querySelector('.japan-content');
+                    if (content) {
+                        const scrollDiff = content.scrollHeight - content.clientHeight - content.scrollTop;
+                        const canScrollDown = scrollDiff > 20;
+                        const canScrollUp = content.scrollTop > 20;
+
+                        if (e.deltaY > 0) {
+                            if (canScrollDown) {
+                                content.scrollTop += 100;
+                            } else {
+                                goToPage(currentPage + 1);
+                            }
+                        } else {
+                            if (canScrollUp) {
+                                content.scrollTop -= 100;
+                            } else {
+                                goToPage(currentPage - 1);
+                            }
+                        }
+                        return;
+                    }
+                }
+
+                if (e.deltaY > 0) {
+                    goToPage(currentPage + 1);
+                } else {
+                    goToPage(currentPage - 1);
+                }
+            }, { passive: true });
+
+            window.addEventListener('keydown', function(e) {
+                if (currentPage === 1) {
+                    const content = document.querySelector('.allengland-content');
+                    if (content) {
+                        if (e.key === 'PageDown') {
+                            if (content.scrollTop < content.scrollHeight - content.clientHeight) {
+                                content.scrollTop += content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        } else if (e.key === 'PageUp') {
+                            if (content.scrollTop > 0) {
+                                content.scrollTop -= content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (currentPage === 2) {
+                    const content = document.querySelector('.olympic-content');
+                    if (content) {
+                        if (e.key === 'PageDown') {
+                            if (content.scrollTop < content.scrollHeight - content.clientHeight) {
+                                content.scrollTop += content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        } else if (e.key === 'PageUp') {
+                            if (content.scrollTop > 0) {
+                                content.scrollTop -= content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (currentPage === 3) {
+                    const content = document.querySelector('.worldchamp-content');
+                    if (content) {
+                        if (e.key === 'PageDown') {
+                            if (content.scrollTop < content.scrollHeight - content.clientHeight) {
+                                content.scrollTop += content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        } else if (e.key === 'PageUp') {
+                            if (content.scrollTop > 0) {
+                                content.scrollTop -= content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (currentPage === 4) {
+                    const content = document.querySelector('.indonesia-content');
+                    if (content) {
+                        if (e.key === 'PageDown') {
+                            if (content.scrollTop < content.scrollHeight - content.clientHeight) {
+                                content.scrollTop += content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        } else if (e.key === 'PageUp') {
+                            if (content.scrollTop > 0) {
+                                content.scrollTop -= content.clientHeight * 0.8;
+                                e.preventDefault();
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (e.key === 'ArrowDown' || e.key === 'PageDown') {
+                    goToPage(currentPage + 1);
+                } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                    goToPage(currentPage - 1);
+                }
+            });
+
+            let touchStart = 0;
+            let touchStartX = 0;
+            window.addEventListener('touchstart', function(e) {
+                touchStart = e.changedTouches[0].screenY;
+                touchStartX = e.changedTouches[0].screenX;
+            }, { passive: true });
+
+            window.addEventListener('touchend', function(e) {
+                const diffY = touchStart - e.changedTouches[0].screenY;
+                const diffX = touchStartX - e.changedTouches[0].screenX;
+
+                if (currentPage === 1) {
+                    const content = document.querySelector('.allengland-content');
+                    if (content) {
+                        const canScrollDown = content.scrollTop < content.scrollHeight - content.clientHeight;
+                        const canScrollUp = content.scrollTop > 0;
+
+                        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                            if (diffY > 0 && canScrollDown) {
+                                content.scrollTop += 150;
+                                return;
+                            } else if (diffY < 0 && canScrollUp) {
+                                content.scrollTop -= 150;
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (currentPage === 2) {
+                    const content = document.querySelector('.olympic-content');
+                    if (content) {
+                        const canScrollDown = content.scrollTop < content.scrollHeight - content.clientHeight;
+                        const canScrollUp = content.scrollTop > 0;
+
+                        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                            if (diffY > 0 && canScrollDown) {
+                                content.scrollTop += 150;
+                                return;
+                            } else if (diffY < 0 && canScrollUp) {
+                                content.scrollTop -= 150;
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (currentPage === 3) {
+                    const content = document.querySelector('.worldchamp-content');
+                    if (content) {
+                        const canScrollDown = content.scrollTop < content.scrollHeight - content.clientHeight;
+                        const canScrollUp = content.scrollTop > 0;
+
+                        if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 50) {
+                            if (diffY > 0 && canScrollDown) {
+                                content.scrollTop += 150;
+                                return;
+                            } else if (diffY < 0 && canScrollUp) {
+                                content.scrollTop -= 150;
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                if (Math.abs(diffY) > 50) {
+                    goToPage(diffY > 0 ? currentPage + 1 : currentPage - 1);
+                }
+            }, { passive: true });
+        }
+
+        function createJapanPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page japan-page';
+            page.id = 'page6';
+
+            page.innerHTML = `
+                <div class="japan-blend-overlay"></div>
+                <div class="japan-overlay"></div>
+
+                <div class="japan-content">
+                    <div class="japan-header">
+                        <div class="japan-logo">
+                            <img src="images/riben.webp" alt="Japan Open" />
+                        </div>
+                        <h1 class="japan-title"><a href="https://www.huya.com/video/play/1069060702.html" target="_blank" rel="noopener noreferrer">2025年日本羽毛球公开赛</a></h1>
+                        <div class="japan-event-info">
+                            <span>JAPAN OPEN</span>
+                        </div>
+                        <div class="japan-event-meta">
+                            <span class="japan-event-round">男单决赛</span>
+                            <span class="japan-event-date">2025-07-20</span>
+                        </div>
+                    </div>
+
+                    <div class="japan-match-section">
+                        <div class="japan-players">
+                            <div class="japan-player">
+                                <div class="japan-player-name winner">石宇奇</div>
+                                <div class="japan-player-title">SHI YUQI</div>
+                                <div class="japan-player-badge">中国名将</div>
+                            </div>
+                            <div class="japan-vs">VS</div>
+                            <div class="japan-player">
+                                <div class="japan-player-name loser">亚历克斯·拉尼尔</div>
+                                <div class="japan-player-title">ALEX LANIER</div>
+                                <div class="japan-player-badge">法国新星</div>
+                            </div>
+                        </div>
+
+                        <div class="japan-scoreboard">
+                            <div class="japan-score-label">MATCH POINT</div>
+                            <div class="japan-scores">
+                                <div class="japan-score-item highlight">21-17</div>
+                                <span class="japan-score-divider">,</span>
+                                <div class="japan-score-item highlight">21-15</div>
+                            </div>
+                        </div>
+
+                        <div class="japan-winner-section">
+                            <div class="japan-winner-badge">WINNER: 石宇奇</div>
+                        </div>
+                    </div>
+
+                    <div class="japan-detail-cards">
+                        <div class="japan-detail-card">
+                            <div class="japan-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <h3 class="japan-detail-title">赛事背景</h3>
+                            <p class="japan-detail-text">
+                                2025年日本公开赛是石宇奇职业生涯巅峰期的重要赛事，他状态火热，连续斩获多项冠军。法国新星亚历克斯·拉尼尔异军突起，成为本届赛事最大黑马。
+                            </p>
+                        </div>
+                        <div class="japan-detail-card">
+                            <div class="japan-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                                    <line x1="12" y1="22" x2="12" y2="15.5"/>
+                                </svg>
+                            </div>
+                            <h3 class="japan-detail-title">高光时刻</h3>
+                            <p class="japan-detail-text">
+                                决赛中石宇奇展现了世界级的技术和稳定心态，以21-17、21-15直落两局轻松取胜。他的网前控制和精准杀球让对手难以招架。
+                            </p>
+                        </div>
+                        <div class="japan-detail-card">
+                            <div class="japan-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <h3 class="japan-detail-title">赛事意义</h3>
+                            <p class="japan-detail-text">
+                                这场胜利让石宇奇巩固了世界排名第一的位置，证明了他依然是当今羽坛最具统治力的男单选手之一，为巴黎奥运会增添了信心。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            pagesContainer.appendChild(page);
+        }
+
+        function createDenmarkPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            const page = document.createElement('div');
+            page.className = 'page denmark-page';
+            page.id = 'page5';
+
+            page.innerHTML = `
+                <div class="denmark-blend-overlay"></div>
+                <div class="denmark-overlay"></div>
+
+                <div class="denmark-content">
+                    <div class="denmark-header">
+                        <div class="denmark-logo">
+                            <img src="images/danmai.webp" alt="Denmark Open" />
+                        </div>
+                        <h1 class="denmark-title"><a href="https://www.douyin.com/video/7157831977154989315" target="_blank" rel="noopener noreferrer">2022年丹麦羽毛球公开赛</a></h1>
+                        <div class="denmark-event-info">
+                            <span>DENMARK OPEN</span>
+                        </div>
+                        <div class="denmark-event-meta">
+                            <span class="denmark-event-round">男单决赛</span>
+                            <span class="denmark-event-date">2022-10-23</span>
+                        </div>
+                    </div>
+
+                    <div class="denmark-match-section">
+                        <div class="denmark-players">
+                            <div class="denmark-player">
+                                <div class="denmark-player-name winner">石宇奇</div>
+                                <div class="denmark-player-title">SHI YUQI</div>
+                                <div class="denmark-player-badge">中国名将</div>
+                            </div>
+                            <div class="denmark-vs">VS</div>
+                            <div class="denmark-player">
+                                <div class="denmark-player-name loser">李梓嘉</div>
+                                <div class="denmark-player-title">LEE ZII JIA</div>
+                                <div class="denmark-player-badge">大马一哥</div>
+                            </div>
+                        </div>
+
+                        <div class="denmark-scoreboard">
+                            <div class="denmark-score-label">MATCH POINT</div>
+                            <div class="denmark-scores">
+                                <div class="denmark-score-item highlight">21-18</div>
+                                <span class="denmark-score-divider">,</span>
+                                <div class="denmark-score-item highlight">21-18</div>
+                            </div>
+                        </div>
+
+                        <div class="denmark-winner-section">
+                            <div class="denmark-winner-badge">WINNER: 石宇奇</div>
+                        </div>
+                    </div>
+
+                    <div class="denmark-detail-cards">
+                        <div class="denmark-detail-card">
+                            <div class="denmark-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                                </svg>
+                            </div>
+                            <h3 class="denmark-detail-title">赛事背景</h3>
+                            <p class="denmark-detail-text">
+                                2022年丹麦公开赛是石宇奇解禁复出后的重要赛事，他在经历禁赛风波后状态逐步回升。李梓嘉作为大马头号男单，近期状态火热，双方此前交手多次，竞争激烈。
+                            </p>
+                        </div>
+                        <div class="denmark-detail-card">
+                            <div class="denmark-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
+                                    <line x1="12" y1="22" x2="12" y2="15.5"/>
+                                </svg>
+                            </div>
+                            <h3 class="denmark-detail-title">高光时刻</h3>
+                            <p class="denmark-detail-text">
+                                比赛中石宇奇展现了出色的控制能力和进攻威胁，两局比赛都以21-18的相同比分获胜。他在关键分的把握上更为稳定，最终直落两局击败李梓嘉。
+                            </p>
+                        </div>
+                        <div class="denmark-detail-card">
+                            <div class="denmark-detail-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                                </svg>
+                            </div>
+                            <h3 class="denmark-detail-title">赛事意义</h3>
+                            <p class="denmark-detail-text">
+                                这场胜利标志着石宇奇正式回归顶尖行列，证明了他依然具备世界一流水平。对于国羽男单来说，这是一次重要的信心提升，也为后续赛事打下坚实基础。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            pagesContainer.appendChild(page);
+        }
+
+        fetch('data.json')
+            .then(function(response) { return response.json(); })
+            .then(function(races) {
+                totalPages = races.length + 1;
+
+                createAllEnglandPage();
+                createOlympicPage();
+                createWorldChampPage();
+                createIndonesiaPage();
+                createDenmarkPage();
+                createJapanPage();
+
+                for (let i = 6; i < races.length; i++) {
+                    createRacePage(races[i], i + 1);
+                }
+
+                createPagination();
+                addEventListeners();
+            })
+            .catch(function(error) {
+                console.error('加载数据失败:', error);
+            });
+    </script>
+</body>
+</html>
